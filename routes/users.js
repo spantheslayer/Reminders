@@ -1,8 +1,35 @@
 var express = require("express");
 var router = express.Router();
 
+const nodemailer = require("nodemailer");
+
 const Users = require("../model/user");
 const HTTPError = require("../errorMessage");
+const config = require("../config/default.json");
+
+const smtpConfig = {
+  host: config.aws_ses.host,
+  port: config.aws_ses.port,
+  auth: {
+    user: config.aws_ses.smtp_user,
+    pass: config.aws_ses.smtp_password,
+  },
+};
+
+//email transport config
+const transporter = nodemailer.createTransport(smtpConfig);
+const sendMail = (mailOptions) => {
+  new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return reject(error);
+      } else {
+        console.log("email send");
+        return resolve(info);
+      }
+    });
+  });
+};
 
 router.route("/signup").post(async (req, res) => {
   try {
@@ -49,6 +76,16 @@ router.route("/signup").post(async (req, res) => {
     else {
       newUser.save(() => {
         res.status(200).json({ status: "ok" });
+
+        // email message option
+        const mailOptions = {
+          from: `"${config.aws_ses.from_name}" <${config.aws_ses.from_email}>`,
+          to: newUser.email,
+          subject: "Email Verification Code",
+          text: `Your Email Verification Code : ${email_verification_code}`,
+        };
+
+        sendMail(mailOptions);
       });
     }
   } catch (err) {
