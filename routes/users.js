@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 const Users = require("../model/user");
+const HTTPError = require("../errorMessage");
 
 router.route("/signup").post(async (req, res) => {
   try {
@@ -48,6 +49,41 @@ router.route("/signup").post(async (req, res) => {
     else {
       newUser.save(() => {
         res.status(200).json({ status: "ok" });
+      });
+    }
+  } catch (err) {
+    return res.status(err.statusCode || 400).json({ status: "error", message: err.message });
+  }
+});
+
+router.route("/login").post(async (req, res) => {
+  try {
+    if (!req.body) throw new HTTPError(400, "Request body empty");
+    let email = req.body.email;
+    const password = req.body.password;
+    const ip = req.headers["x-forwarded-for"];
+
+    if (!email) throw new HTTPError(400, "Email not found");
+    email = email.toLowerCase();
+    const re = /^(([^<>()[\]\\.,;:\s@\\"]+(\.[^<>()[\]\\.,;:\s@\\"]+)*)|(\\".+\\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const validEmail = re.test(email);
+    if (!validEmail) throw new HTTPError(400, "Email is invalid");
+
+    if (!password) throw new HTTPError(400, "Password missing");
+    if (password.length < 6 || password.length > 64) throw new HTTPError(400, "password is invalid");
+
+    const user = await Users.findOne({ email });
+    if (!user) throw new HTTPError(400, "Invalid user");
+    else {
+      user.comparePassword(req.body.password, (err, isMatch) => {
+        if (isMatch && !err) {
+          user.is_logged_in = true;
+          user.save(() => {
+            res.status(200).json({ status: "logged in" });
+          });
+        } else {
+          res.status(400).send({ status: "error", message: "Sign In failed" });
+        }
       });
     }
   } catch (err) {
