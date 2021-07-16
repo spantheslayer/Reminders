@@ -1,0 +1,10 @@
+{
+  "aws_ses": {
+    "host": "email-smtp.ap-south-1.amazonaws.com",
+    "smtp_user": "AKIATWJG27D226QQC6T6",
+    "smtp_password": "BE2gWiYkuOP4mid6LiHwHGnIVO3kIi6WPR5Doq4MXheJ",
+    "port": "587",
+    "from_email": "supriyosarkar282@gmail.com",
+    "from_name": "Durbin Reminder"
+  }
+}
