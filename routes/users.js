@@ -91,4 +91,24 @@ router.route("/login").post(async (req, res) => {
   }
 });
 
+//verifying the email
+router.route("/email-verification").put(async (req, res) => {
+  try {
+    const email = req.body.email;
+    const email_verification_code = req.body.email_verification_code;
+    if (!email_verification_code) throw new HTTPError(400, "Verification code is missing");
+
+    const user = await Users.findOne({ email });
+    if (email_verification_code != user.email_verification_code) throw new HTTPError(400, "wrong code");
+    else if (user.email_confirmed === true) {
+      res.status(200).json({ status: "ok", message: "Account already verified" });
+    } else if (email_verification_code === user.email_verification_code) {
+      user.email_confirmed = true;
+      user.save(() => res.status(200).json({ status: "ok", message: "Account verified" }));
+    }
+  } catch (err) {
+    return res.status(err.statusCode || 400).json({ status: "error", message: err.message });
+  }
+});
+
 module.exports = router;
