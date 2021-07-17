@@ -31,6 +31,19 @@ const sendMail = (mailOptions) => {
   });
 };
 
+/**
+ * @api {post} /users/signup/ signup
+ * @apiName signup_request
+ *
+ * @apiParam {String} Email ID of the user.
+ * @apiParam {String} password Mandatory password.
+ * @apiParam {String} Name of the user.
+ *
+ * @apiSuccess {String} status response status string.
+ * @apiSuccess {Boolean} email_confirmed  Email confirmation status.
+ * @apiSuccess {Object} user logged in status.
+ */
+
 router.route("/signup").post(async (req, res) => {
   try {
     if (!req.body) throw new HTTPError(400, "Post data invalid");
@@ -93,6 +106,17 @@ router.route("/signup").post(async (req, res) => {
   }
 });
 
+/**
+ * @api {post} /users/login/ login
+ * @apiName login_request
+ *
+ * @apiParam {String} Email ID of the user.
+ * @apiParam {String} password Mandatory password.
+ *
+ * @apiSuccess {String} status response status string.
+ * @apiSuccess {Object} user logged in status.
+ */
+
 router.route("/login").post(async (req, res) => {
   try {
     if (!req.body) throw new HTTPError(400, "Request body empty");
@@ -129,6 +153,15 @@ router.route("/login").post(async (req, res) => {
 });
 
 //verifying the email
+
+/**
+ * @api {post} /users/email-verification/ Email Verification
+ * @apiName login_request
+ *
+ * @apiParam {String} Email ID of the user.
+ * @apiParam {String} email_verification_code sent to user email.
+ */
+
 router.route("/email-verification").put(async (req, res) => {
   try {
     const email = req.body.email;
