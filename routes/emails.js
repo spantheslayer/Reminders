@@ -5,7 +5,7 @@ const nodemailer = require("nodemailer");
 const schedule = require("node-schedule");
 
 const HTTPError = require("../errorMessage");
-const user = require("../routes/users");
+// const user = require("../routes/users");
 const config = require("../config/default.json");
 const email = require("../model/email");
 
@@ -51,18 +51,22 @@ router.route("/").post(async (req, res) => {
       scheduled_time,
     });
 
-    newReminder.save(() => {
-      res.status(200).json({ status: "ok" });
-      const date = new Date(scheduled_time);
-      schedule.scheduleJob(date, () => {
-        const mailOptions = {
-          from: `"${config.aws_ses.from_name}" <${config.aws_ses.from_email}>`,
-          to: newReminder.reminder_email,
-          subject: newReminder.reminder_name,
-          text: description,
-        };
-        sendMail(mailOptions);
-      });
+    newReminder.save(function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.status(200).json({ status: "ok", newReminder });
+        const date = new Date(scheduled_time);
+        schedule.scheduleJob(date, () => {
+          const mailOptions = {
+            from: `"${config.aws_ses.from_name}" <${config.aws_ses.from_email}>`,
+            to: newReminder.reminder_email,
+            subject: newReminder.reminder_name,
+            text: description,
+          };
+          sendMail(mailOptions);
+        });
+      }
     });
   } catch (err) {
     return res.status(err.statusCode || 400).json({ status: "error", message: err.message });
