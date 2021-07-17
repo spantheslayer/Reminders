@@ -107,4 +107,18 @@ router.route("/update-reminder/:id").put(async (req, res) => {
   }
 });
 
+router.route("/:id").delete(async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await email.findByIdAndDelete(id);
+    // res.send(result);
+    if (!result) throw new HTTPError(404, "invalid id");
+    else {
+      return res.status(200).json({ status: "deleted", result });
+    }
+  } catch (err) {
+    return res.status(err.statusCode || 400).json({ status: "error", message: err.message });
+  }
+});
+
 module.exports = router;
