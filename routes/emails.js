@@ -95,13 +95,6 @@ router.route("/update-reminder/:id").put(async (req, res) => {
         }
       });
     }
-
-    // const updates = req.body;
-    // const options = { new: true };
-
-    // const result = await email.findByIdAndUpdate(id, updates, options);
-    // res.send(result);
-    // return res.status(200).json({ status: "ok" });
   } catch (err) {
     return res.status(err.statusCode || 400).json({ status: "error", message: err.message });
   }
