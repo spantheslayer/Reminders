@@ -5,7 +5,7 @@ const nodemailer = require("nodemailer");
 const schedule = require("node-schedule");
 
 const HTTPError = require("../errorMessage");
-// const userRoute = require("../routes/users");
+const user = require("../routes/users");
 const config = require("../config/default.json");
 const email = require("../model/email");
 
@@ -64,6 +64,44 @@ router.route("/").post(async (req, res) => {
         sendMail(mailOptions);
       });
     });
+  } catch (err) {
+    return res.status(err.statusCode || 400).json({ status: "error", message: err.message });
+  }
+});
+
+router.route("/update-reminder/:id").put(async (req, res) => {
+  try {
+    const id = req.params.id;
+    const rem_object = await email.findOne({ _id: id });
+
+    const reminder_name = req.body.reminder_name;
+    const scheduled_time = req.body.scheduled_time;
+    const description = req.body.description;
+    const reminder_email = req.body.reminder_email;
+
+    if (!rem_object) throw new HTTPError(404, "invlid data");
+    else {
+      rem_object.reminder_name = reminder_name;
+      rem_object.scheduled_time = scheduled_time;
+      rem_object.description = description;
+      rem_object.reminder_email = reminder_email;
+
+      rem_object.save((err, updateObj) => {
+        if (err) {
+          console.log(err);
+          res.status(500).send();
+        } else {
+          res.send(updateObj);
+        }
+      });
+    }
+
+    // const updates = req.body;
+    // const options = { new: true };
+
+    // const result = await email.findByIdAndUpdate(id, updates, options);
+    // res.send(result);
+    // return res.status(200).json({ status: "ok" });
   } catch (err) {
     return res.status(err.statusCode || 400).json({ status: "error", message: err.message });
   }
