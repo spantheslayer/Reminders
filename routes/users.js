@@ -156,7 +156,7 @@ router.route("/login").post(async (req, res) => {
 
 /**
  * @api {post} /users/email-verification/ Email Verification
- * @apiName login_request
+ * @apiName email_verification_request
  *
  * @apiParam {String} Email ID of the user.
  * @apiParam {String} email_verification_code sent to user email.
