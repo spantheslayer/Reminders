@@ -18,6 +18,7 @@ const smtpConfig = {
 
 //email transport config
 const transporter = nodemailer.createTransport(smtpConfig);
+
 const sendMail = (mailOptions) => {
   new Promise((resolve, reject) => {
     transporter.sendMail(mailOptions, (error, info) => {

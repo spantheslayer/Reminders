@@ -81,12 +81,10 @@ router.route("/update-reminder/:id").put(async (req, res) => {
     const reminder_name = req.body.reminder_name;
     const scheduled_time = req.body.scheduled_time;
     const description = req.body.description;
-    const reminder_email = req.body.reminder_email;
 
     if (!rem_object) throw new HTTPError(404, "invlid data");
     else {
       rem_object.reminder_name = reminder_name;
-      rem_object.scheduled_time = scheduled_time;
       rem_object.description = description;
       rem_object.reminder_email = reminder_email;
 
